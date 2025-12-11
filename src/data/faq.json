@@ -1,0 +1,45 @@
+{
+  "categories": [
+    {
+      "id": "general",
+      "name": "常见问题",
+      "description": "一般性问题和解答"
+    },
+    {
+      "id": "usage",
+      "name": "使用指南",
+      "description": "如何在网页端使用FAQ聊天框"
+    }
+  ],
+  "items": [
+    {
+      "id": "1",
+      "categoryId": "general",
+      "question": "如何开始使用聊天机器人？",
+      "answer": "在输入框中输入您的问题并发送，我会为您提供答案。😊",
+      "keywords": ["开始", "使用", "聊天", "机器人"]
+    },
+    {
+      "id": "2",
+      "categoryId": "usage",
+      "question": "聊天记录是否会保存？",
+      "answer": "会的！聊天记录会保存在您的浏览器LocalStorage中，您可以随时查看。💾",
+      "keywords": ["历史", "聊天记录", "保存", "localstorage"]
+    },
+    {
+      "id": "3",
+      "categoryId": "usage",
+      "question": "支持哪些模型？",
+      "answer": "目前支持本地FAQ匹配（开源逻辑），后续可接入OpenAI等平台。🔌",
+      "keywords": ["模型", "开源", "openai", "ai"]
+    },
+    {
+      "id": "4",
+      "categoryId": "general",
+      "question": "界面是什么风格？",
+      "answer": "采用暗色主题，三栏布局：侧边栏、顶部标题栏、聊天区域。🌙",
+      "keywords": ["暗色", "主题", "布局", "aside", "header", "chat"]
+    }
+  ]
+}
+
