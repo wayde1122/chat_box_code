@@ -1,42 +1,51 @@
 "use client";
 
-import { Bot } from "lucide-react";
+import { Bot, Sparkles } from "lucide-react";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden py-20 px-6">
-      {/* 背景装饰 */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 h-96 w-96 rounded-full bg-violet-600/20 blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-cyan-600/20 blur-3xl" />
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#4f4f4f12_1px,transparent_1px),linear-gradient(to_bottom,#4f4f4f12_1px,transparent_1px)] bg-[size:4rem_4rem]" />
-      </div>
-
+    <section className="relative px-6 pb-6">
       <div className="mx-auto max-w-4xl text-center">
         {/* Logo */}
-        <div className="mb-8 flex justify-center">
+        <div className="mb-4 flex justify-center">
           <div className="relative">
-            <div className="absolute inset-0 animate-pulse rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-500 blur-xl opacity-50" />
-            <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 shadow-2xl">
-              <Bot className="h-10 w-10 text-white" strokeWidth={1.5} />
+            {/* 外层光晕动画 */}
+            <div className="absolute -inset-3 animate-pulse rounded-2xl bg-gradient-to-r from-violet-500/50 to-cyan-500/50 blur-xl" />
+            {/* 内层光晕 */}
+            <div className="absolute -inset-1 rounded-xl bg-gradient-to-r from-violet-500 to-cyan-500 opacity-75 blur-md" />
+            {/* 图标容器 */}
+            <div className="relative flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 to-cyan-500 shadow-2xl shadow-violet-500/30">
+              <Bot className="h-8 w-8 text-white" strokeWidth={1.5} />
             </div>
           </div>
         </div>
 
         {/* 标题 */}
-        <h1 className="mb-6 bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-5xl font-bold tracking-tight text-transparent sm:text-6xl lg:text-7xl">
-          AI Agent Hub
-        </h1>
+        <div className="mb-3">
+          <h1 className="inline-flex items-center justify-center gap-2 text-4xl font-bold leading-normal sm:text-5xl lg:text-6xl">
+            <span className="bg-gradient-to-r from-white via-white to-slate-300 bg-clip-text pb-1 text-transparent">
+              AI Agent
+            </span>
+            <span className="bg-gradient-to-r from-violet-400 to-cyan-400 bg-clip-text pb-1 text-transparent">
+              Hub
+            </span>
+          </h1>
+        </div>
 
         {/* 副标题 */}
-        <p className="mb-4 text-xl text-slate-400 sm:text-2xl">
-          您的智能助手，触手可及
-        </p>
-        <p className="mx-auto max-w-2xl text-base text-slate-500">
-          探索多种 AI Agent，为您的工作与生活提供智能化支持。从旅行规划到代码编写，我们让 AI 成为您的得力助手。
+        <div className="mb-2 flex items-center justify-center gap-2">
+          <Sparkles className="h-4 w-4 text-amber-400" />
+          <p className="text-lg text-slate-300 sm:text-xl">
+            您的智能助手，触手可及
+          </p>
+          <Sparkles className="h-4 w-4 text-amber-400" />
+        </div>
+
+        {/* 描述 */}
+        <p className="mx-auto max-w-xl text-sm leading-relaxed text-slate-400">
+          探索多种 AI Agent，为您的工作与生活提供智能化支持
         </p>
       </div>
     </section>
   );
 }
-
