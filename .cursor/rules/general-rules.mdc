@@ -1,0 +1,271 @@
+---
+alwaysApply: true
+---
+
+# 全局 Cursor Rules（项目级）
+
+> 适用于本项目的 **Cursor / AI Assistant 全局规则**，用于约束代码生成、修改、重构与回答方式。
+> 技术栈：Next.js 14 + React 18 + TypeScript + Tailwind + Shadcn UI
+
+---
+
+## 1. 总体目标（High-Level Goals）
+
+- **优先可维护性**：清晰的模块边界、可预测的数据流、低耦合
+- **严格类型安全**：所有新代码必须使用 TypeScript 且避免 `any`
+- **前端优先架构**：无独立后端，逻辑以内聚的 service + hook 为核心
+- **渐进式 AI 接入**：当前以 FAQ 匹配为主，未来可无痛替换为真实 AI 模型
+- **用户体验优先**：响应快、状态明确、错误可解释
+
+---
+
+## 2. 架构与目录规则（Architecture Rules）
+
+### 2.1 分层原则（必须遵守）
+
+- **UI 组件层（components/ui）**
+
+  - 仅负责展示
+  - 不包含业务逻辑
+  - 不直接访问 localStorage / API
+
+- **业务组件层（components/chat | components/faq）**
+
+  - 可使用 hooks
+  - 不直接操作 localStorage
+  - 不包含数据持久化逻辑
+
+- **Hooks 层（hooks）**
+
+  - 封装状态与副作用
+  - 调用 services
+  - 不包含 JSX
+
+- **Services 层（services）**
+
+  - 唯一允许：
+
+    - 访问 localStorage
+    - 读取 FAQ JSON
+    - 调用 /api 接口
+
+  - 不依赖 React
+
+- **Data 层（data）**
+
+  - 只存静态数据
+  - 不包含逻辑
+
+❌ 禁止：组件直接访问 `localStorage`
+
+---
+
+## 3. Next.js & React 规则
+
+### 3.1 组件规则
+
+- 默认使用 **函数组件**
+- 必须使用 **React Hooks**
+- 禁止使用 class component
+
+```ts
+// ✅ 推荐
+export function ChatContainer() {}
+
+// ❌ 禁止
+class ChatContainer extends React.Component {}
+```
+
+### 3.2 Server / Client 组件
+
+- 页面（app/page.tsx）默认 Server Component
+- 只要使用以下能力，必须加：
+
+```ts
+"use client";
+```
+
+- useState / useEffect
+- onClick / onChange
+- localStorage
+
+---
+
+## 4. TypeScript 规则（非常重要）
+
+### 4.1 类型定义
+
+- 所有公共结构 **必须** 定义在 `types/` 中
+- 禁止在组件内定义重复 interface
+
+```ts
+// ✅ 正确
+import { ChatMessage } from "@/types/chat";
+
+// ❌ 错误
+interface ChatMessage { ... }
+```
+
+### 4.2 禁止项
+
+- ❌ `any`
+- ❌ `as any`
+- ❌ 忽略类型错误（@ts-ignore）
+
+### 4.3 推荐项
+
+- 使用 `union type` 而非 string
+- 使用 `Readonly<T>` 表示不可变数据
+
+---
+
+## 5. 状态管理规则
+
+### 5.1 状态来源优先级
+
+1. 组件本地 state（useState）
+2. 业务 Hook（useChat / useFAQ）
+3. LocalStorage（通过 StorageService）
+
+### 5.2 聊天状态规则
+
+- ChatHistory 为 **单一可信数据源**
+- UI 状态不得直接修改 history
+- 更新必须通过 service → hook → state
+
+---
+
+## 6. Service 设计规则
+
+### 6.1 Service 基本原则
+
+- Service 是 **无状态的**（stateless）
+- 不保存 React state
+- 可被多个 Hook 复用
+
+```ts
+// ✅ 推荐
+class ChatService {
+  async sendMessage(question: string): Promise<ChatResponse> {}
+}
+```
+
+### 6.2 FAQ 匹配规则
+
+- 优先：关键词命中
+- 次级：问题相似度（字符串包含 / 编辑距离）
+- 找不到必须返回 `null`
+
+❌ 禁止在 Service 中返回 JSX
+
+---
+
+## 7. API Route 规则（/api）
+
+- 所有 API 返回 **JSON**
+- 不访问浏览器 API（localStorage）
+- 使用明确的 HTTP 状态码
+
+```ts
+return Response.json(data, { status: 200 });
+```
+
+---
+
+## 8. UI & Tailwind 规则
+
+### 8.1 Tailwind 使用规范
+
+- 禁止内联 style
+- 优先使用设计系统中的颜色
+
+```tsx
+// ✅
+<div className="bg-slate-800 text-slate-100" />
+
+// ❌
+<div style={{ background: "#1e293b" }} />
+```
+
+### 8.2 Shadcn UI 规则
+
+- 不修改 node_modules
+- 自定义样式通过 wrapper 组件实现
+
+---
+
+## 9. 本地存储（LocalStorage）规则
+
+- 只能通过 `StorageService`
+- 必须有默认值兜底
+- 必须考虑 JSON parse 失败场景
+
+```ts
+try {
+  JSON.parse(stored);
+} catch {
+  return getDefaultHistory();
+}
+```
+
+---
+
+## 10. 性能与体验规则
+
+- 聊天消息列表必须支持虚拟化（如后期引入）
+- 大于 `NEXT_PUBLIC_MAX_HISTORY_LENGTH` 必须截断
+- 用户操作必须立即有 UI 反馈（loading / typing）
+
+---
+
+## 11. 错误处理规则
+
+- 不允许静默失败
+- 用户可见错误必须：
+
+  - 语言友好
+  - 可理解
+
+```ts
+"抱歉，当前服务暂不可用，请稍后再试 🤔";
+```
+
+---
+
+## 12. Cursor 行为约束（给 AI 的指令）
+
+Cursor 在本项目中 **必须遵守**：
+
+1. **优先修改最少代码**，避免大规模重构
+2. 修改前先理解：
+
+   - 当前目录
+   - 所属层级（UI / Hook / Service）
+
+3. 不引入未声明的新库
+4. 不假设存在后端或数据库
+5. 所有示例代码必须：
+
+   - 可直接粘贴使用
+   - 类型完整
+
+---
+
+## 13. 未来扩展约定（AI 接入）
+
+- AI 模型只能通过 `ChatService`
+- 保持 `ChatResponse` 接口不变
+- 不破坏 FAQ fallback 逻辑
+
+---
+
+## 14. 最终原则（Summary）
+
+> **清晰优于聪明，稳定优于炫技，可维护性高于一切。**
+
+当规则冲突时，按以下优先级：
+
+1. 类型安全
+2. 架构边界
+3. 用户体验
+4. 性能优化

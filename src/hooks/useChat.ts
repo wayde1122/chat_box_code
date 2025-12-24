@@ -25,34 +25,42 @@ export function useChat() {
     setHistory(getDefaultHistory());
   }, []);
 
-  const send = React.useCallback(async (question: string) => {
-    setSending(true);
-    try {
-      const resp = await sendChat(question);
-      const userMsg: ChatMessage = {
-        id: crypto.randomUUID(),
-        question,
-        answer: "",
-        model: resp.model,
-        timestamp: Date.now(),
-        type: "user",
-      };
-      addMessage(userMsg);
+  const send = React.useCallback(
+    async (question: string, model = "travel-agent") => {
+      setSending(true);
+      try {
+        // 先添加用户消息
+        const userMsg: ChatMessage = {
+          id: crypto.randomUUID(),
+          question,
+          answer: "",
+          model,
+          timestamp: Date.now(),
+          type: "user",
+        };
+        addMessage(userMsg);
 
-      const botMsg: ChatMessage = {
-        id: crypto.randomUUID(),
-        question: resp.question,
-        answer: resp.answer,
-        model: resp.model,
-        timestamp: Date.now(),
-        type: "assistant",
-      };
-      addMessage(botMsg);
-    } finally {
-      setSending(false);
-    }
-  }, [addMessage]);
+        // 调用 API 获取回复
+        const resp = await sendChat(question, model);
+
+        // 添加助手消息
+        const botMsg: ChatMessage = {
+          id: crypto.randomUUID(),
+          question: resp.question,
+          answer: resp.answer,
+          model: resp.model,
+          timestamp: Date.now(),
+          type: "assistant",
+          steps: resp.steps,
+          usedTools: resp.usedTools,
+        };
+        addMessage(botMsg);
+      } finally {
+        setSending(false);
+      }
+    },
+    [addMessage]
+  );
 
   return { history, sending, send, clear } as const;
 }
-

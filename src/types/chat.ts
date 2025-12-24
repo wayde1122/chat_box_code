@@ -1,4 +1,6 @@
-export type SenderType = 'user' | 'assistant';
+import type { AgentStep } from "./agent";
+
+export type SenderType = "user" | "assistant";
 
 export interface ChatMessage {
   id: string;
@@ -7,11 +9,15 @@ export interface ChatMessage {
   model: string;
   timestamp: number;
   type: SenderType;
+  /** Agent 模式下的思考步骤 */
+  steps?: AgentStep[];
+  /** 是否使用了工具 */
+  usedTools?: boolean;
 }
 
 export interface ChatHistorySettings {
-  theme: 'dark' | 'light';
-  fontSize: 'small' | 'medium' | 'large';
+  theme: "dark" | "light";
+  fontSize: "small" | "medium" | "large";
 }
 
 export interface ChatHistory {
@@ -19,4 +25,3 @@ export interface ChatHistory {
   lastUpdated: number;
   settings: ChatHistorySettings;
 }
-

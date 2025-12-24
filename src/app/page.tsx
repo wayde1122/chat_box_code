@@ -1,10 +1,11 @@
-import { ChatLayout } from "@/components/layout/ChatLayout";
-import { ChatContainer } from "@/components/chat/ChatContainer";
+import { HeroSection } from "@/components/home/HeroSection";
+import { AgentGrid } from "@/components/home/AgentGrid";
 
 export default function Home() {
   return (
-    <ChatLayout>
-      <ChatContainer />
-    </ChatLayout>
+    <main className="min-h-screen">
+      <HeroSection />
+      <AgentGrid />
+    </main>
   );
 }
