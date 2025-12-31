@@ -63,7 +63,7 @@ export function TravelPlanner() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* 顶部导航 */}
       <header className="sticky top-0 z-50 border-b border-slate-800 bg-slate-900/80 backdrop-blur-sm">
-        <div className="container mx-auto px-4 h-14 flex items-center justify-between">
+        <div className=" mx-auto px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/"
