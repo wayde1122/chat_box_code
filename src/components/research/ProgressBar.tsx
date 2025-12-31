@@ -99,19 +99,19 @@ export function ProgressBar({
           <StageIndicator
             label="规划"
             isActive={status === "planning"}
-            isCompleted={status !== "planning" && status !== "idle"}
+            isCompleted={status === "executing" || status === "reporting"}
           />
           <div className="w-8 h-px bg-slate-700" />
           <StageIndicator
             label="执行"
             isActive={status === "executing"}
-            isCompleted={status === "reporting" || status === "completed"}
+            isCompleted={status === "reporting"}
           />
           <div className="w-8 h-px bg-slate-700" />
           <StageIndicator
             label="报告"
             isActive={status === "reporting"}
-            isCompleted={status === "completed"}
+            isCompleted={false}
           />
         </div>
       )}
