@@ -22,6 +22,7 @@ export type ResearchStatus =
 
 /** SSE 事件类型 */
 export type SSEEventType =
+  | "start"
   | "plan"
   | "progress"
   | "task_complete"
