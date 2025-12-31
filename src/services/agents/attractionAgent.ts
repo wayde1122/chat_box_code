@@ -1,7 +1,7 @@
 /**
  * 景点搜索 Agent
  * 负责根据用户偏好搜索景点信息
- * 
+ *
  * 注意：图片获取已移至前端，在计划生成后异步加载
  */
 
@@ -46,7 +46,9 @@ export class AttractionSearchAgent extends BaseAgent<
   readonly name = "AttractionSearchAgent";
   readonly description = "景点搜索专家，专注于搜索符合用户偏好的景点信息";
 
-  protected async run(input: AttractionSearchInput): Promise<AttractionSearchOutput> {
+  protected async run(
+    input: AttractionSearchInput
+  ): Promise<AttractionSearchOutput> {
     const { city, preferences, limit = 10 } = input;
 
     // 根据偏好生成搜索关键词
@@ -95,4 +97,3 @@ export class AttractionSearchAgent extends BaseAgent<
 
 // 导出单例实例
 export const attractionAgent = new AttractionSearchAgent();
-
