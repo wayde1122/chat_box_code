@@ -78,8 +78,8 @@ export default function ResearchPage() {
       {/* 主内容区域 - 填满剩余空间 */}
       <main className="flex-1 min-h-0 max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col gap-6 h-full">
-          {/* 输入表单 */}
-          <section className="glass rounded-xl p-6 flex-shrink-0">
+          {/* 输入表单 - overflow-visible 确保下拉菜单不被裁剪 */}
+          <section className="glass rounded-xl p-6 flex-shrink-0 overflow-visible relative z-20">
             <ResearchForm
               onSubmit={research.startResearch}
               isResearching={research.isResearching}

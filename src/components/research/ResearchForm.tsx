@@ -98,7 +98,7 @@ export function ResearchForm({ onSubmit, isResearching }: ResearchFormProps) {
 
           {/* 下拉菜单 */}
           {isDropdownOpen && (
-            <div className="absolute top-full left-0 right-0 mt-2 py-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-50">
+            <div className="absolute top-full left-0 right-0 mt-2 py-2 bg-slate-800 border border-slate-700 rounded-xl shadow-xl z-[100]">
               {SEARCH_BACKENDS.map((backend) => (
                 <button
                   key={backend.value}
