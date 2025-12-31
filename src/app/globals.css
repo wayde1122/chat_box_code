@@ -141,3 +141,44 @@ input:focus, textarea:focus {
 .btn-glow:hover {
   box-shadow: 0 0 20px rgba(139, 92, 246, 0.4);
 }
+
+/* 日期选择器暗色主题优化 */
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"] {
+  color-scheme: dark;
+  cursor: pointer;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="time"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.8) brightness(0.8);
+  opacity: 1;
+  transition: filter 0.2s ease;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover,
+input[type="time"]::-webkit-calendar-picker-indicator:hover,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(0.8) brightness(1.2);
+}
+
+/* 可点击元素默认样式 */
+button,
+[role="button"],
+.clickable {
+  cursor: pointer;
+}
+
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+/* Loading 状态下的光标 */
+.loading,
+[aria-busy="true"] {
+  cursor: wait;
+}

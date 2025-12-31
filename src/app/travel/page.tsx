@@ -1,6 +1,5 @@
-import { ChatContainer } from "@/components/chat/ChatContainer";
+import { TravelPlanner } from "@/components/travel";
 
 export default function TravelPage() {
-  return <ChatContainer />;
+  return <TravelPlanner />;
 }
-
