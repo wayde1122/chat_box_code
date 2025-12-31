@@ -16,8 +16,8 @@ export function AgentGrid() {
         <h2 className="text-sm font-medium text-slate-300">立即体验</h2>
       </div>
 
-      {/* 主推 Agent */}
-      <div className="mb-6">
+      {/* 主推 Agent - 网格布局 */}
+      <div className="mb-6 grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
         {featuredAgents.map((agent) => (
           <AgentCard key={agent.id} agent={agent} featured />
         ))}
@@ -40,7 +40,7 @@ export function AgentGrid() {
           </div>
 
           {/* 卡片网格 */}
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
             {comingSoonAgents.map((agent) => (
               <AgentCard key={agent.id} agent={agent} />
             ))}

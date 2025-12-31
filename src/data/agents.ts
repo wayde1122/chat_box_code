@@ -21,12 +21,12 @@ export const agents: readonly Agent[] = [
     gradient: "from-violet-500 to-cyan-500",
   },
   {
-    id: "code",
-    name: "代码助手",
-    description: "智能编程助手，帮您解决开发难题",
-    icon: "Code",
-    href: "/code",
-    status: "coming-soon",
+    id: "research",
+    name: "深度研究助手",
+    description: "自动化执行深度研究任务，生成结构化研究报告",
+    icon: "BarChart3",
+    href: "/research",
+    status: "available",
     gradient: "from-emerald-500 to-teal-500",
   },
   {
@@ -48,4 +48,3 @@ export const agents: readonly Agent[] = [
     gradient: "from-blue-500 to-purple-500",
   },
 ] as const;
-
