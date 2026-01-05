@@ -38,6 +38,18 @@ export interface GeoLocation {
   latitude: number;
 }
 
+/** 图片归属信息（Unsplash 要求） */
+export interface ImageAttribution {
+  /** 摄影师名称 */
+  photographer: string;
+  /** 摄影师主页链接 */
+  photographerUrl: string;
+  /** 图片来源（如 "Unsplash"） */
+  source: string;
+  /** 图片来源链接 */
+  sourceUrl: string;
+}
+
 /** 景点信息 */
 export interface Attraction {
   /** 景点ID */
@@ -58,6 +70,8 @@ export interface Attraction {
   description: string;
   /** 景点图片URL */
   imageUrl?: string;
+  /** 图片归属信息 */
+  imageAttribution?: ImageAttribution;
   /** 评分 */
   rating?: number;
   /** 开放时间 */

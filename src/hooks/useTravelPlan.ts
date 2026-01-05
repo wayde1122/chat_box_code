@@ -7,7 +7,15 @@ import type {
   TravelPlanResponse,
   ItineraryDay,
   ItineraryItem,
+  ImageAttribution,
 } from "@/types/travel";
+
+/** 图片 API 响应数据 */
+interface ImageData {
+  url: string;
+  photographer: string;
+  photographerUrl: string;
+}
 
 /** Hook 状态 */
 interface TravelPlanState {
@@ -91,12 +99,12 @@ export function useTravelPlan(): UseTravelPlanReturn {
           }),
         });
 
-        const data: { images: Record<string, string> } = await response.json();
+        const data: { images: Record<string, ImageData> } = await response.json();
         const imageMap = new Map(Object.entries(data.images ?? {}));
 
         console.log(`[useTravelPlan] 获取到 ${imageMap.size} 张图片`);
 
-        // 更新计划中的图片
+        // 更新计划中的图片（包含归属信息）
         setState((prev) => {
           if (!prev.plan) return { ...prev, loadingImages: false };
 
@@ -104,11 +112,20 @@ export function useTravelPlan(): UseTravelPlanReturn {
             ...day,
             items: day.items.map((item) => {
               if (item.attraction && imageMap.has(item.attraction.id)) {
+                const imageData = imageMap.get(item.attraction.id)!;
+                // 构建归属信息
+                const attribution: ImageAttribution = {
+                  photographer: imageData.photographer,
+                  photographerUrl: imageData.photographerUrl,
+                  source: "Unsplash",
+                  sourceUrl: "https://unsplash.com",
+                };
                 return {
                   ...item,
                   attraction: {
                     ...item.attraction,
-                    imageUrl: imageMap.get(item.attraction.id),
+                    imageUrl: imageData.url,
+                    imageAttribution: attribution,
                   },
                 };
               }

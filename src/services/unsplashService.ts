@@ -222,6 +222,33 @@ class UnsplashService {
   }
 
   /**
+   * 为景点获取完整的图片信息（包括归属信息）
+   * @param attractionName 景点名称
+   * @param city 城市名称
+   * @returns 完整图片信息
+   */
+  async getAttractionPhotoWithAttribution(
+    attractionName: string,
+    city: string
+  ): Promise<UnsplashPhoto | null> {
+    // 尝试多种搜索策略
+    const queries = [
+      `${attractionName} ${city} China`,
+      attractionName,
+      `${city} landmark`,
+    ];
+
+    for (const query of queries) {
+      const photos = await this.searchPhotos(query, 1);
+      if (photos.length > 0) {
+        return photos[0];
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * 批量获取景点图片
    * @param attractions 景点列表
    * @param city 城市名称
@@ -238,6 +265,34 @@ class UnsplashService {
       const url = await this.getAttractionPhoto(attraction.name, city);
       if (url) {
         result.set(attraction.id, url);
+      }
+    });
+
+    await Promise.allSettled(promises);
+
+    return result;
+  }
+
+  /**
+   * 批量获取景点图片（包含归属信息）
+   * @param attractions 景点列表
+   * @param city 城市名称
+   * @returns 景点ID到完整图片信息的映射
+   */
+  async getAttractionPhotosWithAttribution(
+    attractions: Array<{ id: string; name: string }>,
+    city: string
+  ): Promise<Map<string, UnsplashPhoto>> {
+    const result = new Map<string, UnsplashPhoto>();
+
+    // 使用 Promise.allSettled 并行获取图片，允许部分失败
+    const promises = attractions.map(async (attraction) => {
+      const photo = await this.getAttractionPhotoWithAttribution(
+        attraction.name,
+        city
+      );
+      if (photo) {
+        result.set(attraction.id, photo);
       }
     });
 
@@ -270,3 +325,4 @@ const DEFAULT_ACCESS_KEY = "nIyozV8hr3zs1rSDyJLlPxHvyFXX5ct4LHPSSrcqg2E";
 const accessKey = process.env.UNSPLASH_ACCESS_KEY || DEFAULT_ACCESS_KEY;
 export const unsplashService = new UnsplashService(accessKey);
 export { UnsplashService };
+export type { UnsplashPhoto };

@@ -14,13 +14,123 @@ import {
   Utensils,
   Hotel,
   Navigation,
+  X,
+  ZoomIn,
+  ExternalLink,
 } from "lucide-react";
-import type { ItineraryDay, ItineraryItem, WeatherInfo } from "@/types/travel";
+import type { ItineraryDay, ItineraryItem, WeatherInfo, ImageAttribution } from "@/types/travel";
+
+/** 预览图片信息 */
+interface PreviewImage {
+  url: string;
+  name: string;
+  attribution?: ImageAttribution;
+}
 
 interface ItineraryListProps {
   itinerary: ItineraryDay[];
   onRemoveItem: (dayIndex: number, itemId: string) => void;
   onSelectAttraction?: (item: ItineraryItem) => void;
+}
+
+/**
+ * 图片预览模态框
+ */
+function ImagePreviewModal({
+  image,
+  onClose,
+}: {
+  image: PreviewImage;
+  onClose: () => void;
+}) {
+  // 按 ESC 键关闭
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  // 阻止背景滚动
+  React.useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, []);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      {/* 关闭按钮 */}
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={onClose}
+        className="absolute top-4 right-4 h-10 w-10 p-0 text-white/80 hover:text-white hover:bg-white/10 rounded-full z-10"
+      >
+        <X className="h-6 w-6" />
+      </Button>
+
+      {/* 图片容器 */}
+      <div
+        className="relative max-w-[90vw] max-h-[85vh] flex flex-col"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* 景点名称 */}
+        <div className="text-center mb-3">
+          <h3 className="text-lg font-medium text-white">{image.name}</h3>
+        </div>
+
+        {/* 图片 */}
+        <div className="relative rounded-lg overflow-hidden shadow-2xl">
+          <img
+            src={image.url}
+            alt={image.name}
+            className="max-w-full max-h-[70vh] object-contain"
+          />
+        </div>
+
+        {/* 归属信息 */}
+        {image.attribution && (
+          <div className="mt-3 flex items-center justify-center gap-4 text-sm text-white/80">
+            <span>
+              Photo by{" "}
+              <a
+                href={`${image.attribution.photographerUrl}?utm_source=ai_agent_hub&utm_medium=referral`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-cyan-400 hover:text-cyan-300 underline inline-flex items-center gap-1"
+              >
+                {image.attribution.photographer}
+                <ExternalLink className="h-3 w-3" />
+              </a>
+            </span>
+            <span>on</span>
+            <a
+              href={`${image.attribution.sourceUrl}?utm_source=ai_agent_hub&utm_medium=referral`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-cyan-400 hover:text-cyan-300 underline inline-flex items-center gap-1"
+            >
+              {image.attribution.source}
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+        )}
+
+        {/* 提示文字 */}
+        <p className="mt-2 text-center text-xs text-white/50">
+          按 ESC 或点击空白处关闭
+        </p>
+      </div>
+    </div>
+  );
 }
 
 /**
@@ -37,6 +147,38 @@ function WeatherIcon({ weather }: { weather?: WeatherInfo }) {
     return <Cloud className="h-4 w-4 text-slate-400" />;
   }
   return <Sun className="h-4 w-4 text-amber-400" />;
+}
+
+/**
+ * 图片归属组件（Unsplash 要求）
+ */
+function PhotoAttribution({ attribution }: { attribution?: ImageAttribution }) {
+  if (!attribution) return null;
+
+  return (
+    <div className="absolute bottom-0 left-0 right-0 px-1.5 py-0.5 bg-black/60 text-[9px] text-white/80 truncate">
+      Photo by{" "}
+      <a
+        href={`${attribution.photographerUrl}?utm_source=ai_agent_hub&utm_medium=referral`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {attribution.photographer}
+      </a>
+      {" on "}
+      <a
+        href={`${attribution.sourceUrl}?utm_source=ai_agent_hub&utm_medium=referral`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="underline hover:text-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {attribution.source}
+      </a>
+    </div>
+  );
 }
 
 /**
@@ -64,10 +206,12 @@ function ItineraryItemCard({
   item,
   onRemove,
   onSelect,
+  onPreviewImage,
 }: {
   item: ItineraryItem;
   onRemove: () => void;
   onSelect?: () => void;
+  onPreviewImage?: (image: PreviewImage) => void;
 }) {
   const name =
     item.attraction?.name ??
@@ -80,27 +224,50 @@ function ItineraryItemCard({
     item.restaurant?.address ??
     item.hotel?.address;
 
-  // 获取图片 URL
+  // 获取图片 URL 和归属信息
   const imageUrl = item.attraction?.imageUrl ?? item.hotel?.imageUrl;
+  const imageAttribution = item.attraction?.imageAttribution;
+
+  // 处理图片点击预览
+  const handleImageClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (imageUrl && onPreviewImage) {
+      onPreviewImage({
+        url: imageUrl,
+        name,
+        attribution: imageAttribution,
+      });
+    }
+  };
 
   return (
     <div
       className="group flex items-start gap-3 p-3 rounded-lg bg-slate-800/50 hover:bg-slate-800 transition-colors cursor-pointer"
       onClick={onSelect}
     >
-      {/* 景点图片 */}
+      {/* 景点图片（含 Unsplash 归属信息） */}
       {imageUrl ? (
-        <div className="flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden bg-slate-700">
+        <div
+          className="relative flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden bg-slate-700 group/image cursor-zoom-in"
+          onClick={handleImageClick}
+          title="点击预览大图"
+        >
           <img
             src={imageUrl}
             alt={name}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform group-hover/image:scale-105"
             loading="lazy"
             onError={(e) => {
               // 图片加载失败时隐藏
               (e.target as HTMLImageElement).style.display = "none";
             }}
           />
+          {/* 放大图标提示 */}
+          <div className="absolute inset-0 flex items-center justify-center bg-black/0 group-hover/image:bg-black/30 transition-colors">
+            <ZoomIn className="h-5 w-5 text-white opacity-0 group-hover/image:opacity-100 transition-opacity" />
+          </div>
+          {/* Unsplash 归属标注 */}
+          <PhotoAttribution attribution={imageAttribution} />
         </div>
       ) : (
         <>
@@ -170,11 +337,13 @@ function DayCard({
   dayIndex,
   onRemoveItem,
   onSelectAttraction,
+  onPreviewImage,
 }: {
   day: ItineraryDay;
   dayIndex: number;
   onRemoveItem: (itemId: string) => void;
   onSelectAttraction?: (item: ItineraryItem) => void;
+  onPreviewImage?: (image: PreviewImage) => void;
 }) {
   return (
     <Card className="p-4 bg-slate-900/50 border-slate-700">
@@ -221,6 +390,7 @@ function DayCard({
               item={item}
               onRemove={() => onRemoveItem(item.id)}
               onSelect={() => onSelectAttraction?.(item)}
+              onPreviewImage={onPreviewImage}
             />
           ))
         )}
@@ -237,6 +407,9 @@ export function ItineraryList({
   onRemoveItem,
   onSelectAttraction,
 }: ItineraryListProps) {
+  // 图片预览状态
+  const [previewImage, setPreviewImage] = React.useState<PreviewImage | null>(null);
+
   if (itinerary.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12 text-slate-400">
@@ -248,17 +421,28 @@ export function ItineraryList({
   }
 
   return (
-    <div className="space-y-4">
-      {itinerary.map((day, index) => (
-        <DayCard
-          key={day.date}
-          day={day}
-          dayIndex={index}
-          onRemoveItem={(itemId) => onRemoveItem(index, itemId)}
-          onSelectAttraction={onSelectAttraction}
+    <>
+      <div className="space-y-4">
+        {itinerary.map((day, index) => (
+          <DayCard
+            key={day.date}
+            day={day}
+            dayIndex={index}
+            onRemoveItem={(itemId) => onRemoveItem(index, itemId)}
+            onSelectAttraction={onSelectAttraction}
+            onPreviewImage={setPreviewImage}
+          />
+        ))}
+      </div>
+
+      {/* 图片预览模态框 */}
+      {previewImage && (
+        <ImagePreviewModal
+          image={previewImage}
+          onClose={() => setPreviewImage(null)}
         />
-      ))}
-    </div>
+      )}
+    </>
   );
 }
 
