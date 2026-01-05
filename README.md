@@ -339,7 +339,7 @@ src/
 │   │   ├── searchService.ts      # 搜索调度服务
 │   │   └── researchCoordinator.ts # 研究协调器
 │   ├── mcp/                      # 🛫 MCP 服务
-│   │   └── amapClient.ts         # 高德 MCP 客户端
+│   │   └── amapClient.ts         #    高德 MCP 客户端
 │   ├── unsplashService.ts        # 🛫 图片服务
 │   ├── llmService.ts             # LLM 调用服务
 │   └── ...
