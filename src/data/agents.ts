@@ -4,7 +4,7 @@ export interface Agent {
   id: string;
   name: string;
   description: string;
-  icon: "Plane" | "Code" | "Pencil" | "BarChart3" | "Bot";
+  icon: "Plane" | "Code" | "Pencil" | "BarChart3" | "Bot" | "Newspaper";
   href: string;
   status: AgentStatus;
   gradient: string;
@@ -28,6 +28,15 @@ export const agents: readonly Agent[] = [
     href: "/research",
     status: "available",
     gradient: "from-emerald-500 to-teal-500",
+  },
+  {
+    id: "news",
+    name: "每日热点助手",
+    description: "根据话题自动获取RSS源，生成每日热点日报",
+    icon: "Newspaper",
+    href: "/news",
+    status: "available",
+    gradient: "from-amber-500 to-orange-500",
   },
   {
     id: "writer",

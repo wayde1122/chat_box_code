@@ -144,6 +144,14 @@ body {
   background-clip: text;
 }
 
+/* 暖色渐变文字 */
+.gradient-text-warm {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ef4444 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 /* 输入框聚焦效果 */
 input:focus, textarea:focus {
   outline: none;

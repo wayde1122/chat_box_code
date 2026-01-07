@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Plane, Code, Pencil, BarChart3, Bot, ArrowRight, Clock } from "lucide-react";
+import { Plane, Code, Pencil, BarChart3, Bot, Newspaper, ArrowRight, Clock } from "lucide-react";
 import type { Agent } from "@/data/agents";
 
 const iconMap = {
@@ -10,6 +10,7 @@ const iconMap = {
   Pencil,
   BarChart3,
   Bot,
+  Newspaper,
 } as const;
 
 interface AgentCardProps {
