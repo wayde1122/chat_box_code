@@ -40,16 +40,19 @@ interface PoiSearchResult {
 
 /** 天气查询响应 */
 interface WeatherResult {
+  city?: string;
+  // 注意：MCP 服务器返回的 forecasts 直接是数组，不是嵌套结构
   forecasts?: Array<{
-    city: string;
-    casts: Array<{
-      date: string;
-      week: string;
-      dayweather: string;
-      nightweather: string;
-      daytemp: string;
-      nighttemp: string;
-    }>;
+    date: string;
+    week: string;
+    dayweather: string;
+    nightweather: string;
+    daytemp: string;
+    nighttemp: string;
+    daywind?: string;
+    nightwind?: string;
+    daypower?: string;
+    nightpower?: string;
   }>;
   lives?: Array<{
     city: string;
@@ -103,7 +106,8 @@ class AmapMCPClient {
         env: {
           ...process.env,
           // 使用 Web服务 API Key（用于 MCP/REST API 调用）
-          AMAP_MAPS_API_KEY: process.env.AMAP_API_KEY ?? "a3e5febb5919d7d7a3d486da186b0652",
+          AMAP_MAPS_API_KEY:
+            process.env.AMAP_API_KEY ?? "a3e5febb5919d7d7a3d486da186b0652",
         },
       });
 
@@ -121,7 +125,11 @@ class AmapMCPClient {
       // 列出可用工具（调试用）
       try {
         const tools = await this.client.listTools();
-        console.log("[AmapMCPClient] 可用工具:", tools.tools.map(t => t.name).join(", "));
+        console.log(
+          "[AmapMCPClient] 可用工具:",
+          tools.tools.map((t) => t.name).join(", ")
+        );
+        console.log(tools);
       } catch (e) {
         console.log("[AmapMCPClient] 无法列出工具");
       }
@@ -165,11 +173,11 @@ class AmapMCPClient {
 
     try {
       console.log(`[AmapMCPClient] 调用工具 ${name}:`, args);
-      
-      const result = await this.client.callTool({
+
+      const result = (await this.client.callTool({
         name,
         arguments: args,
-      }) as McpToolResult;
+      })) as McpToolResult;
 
       // 解析返回内容
       if (result.content && Array.isArray(result.content)) {
@@ -182,7 +190,10 @@ class AmapMCPClient {
             console.log(`[AmapMCPClient] 工具 ${name} 返回成功`);
             return parsed;
           } catch (jsonError) {
-            console.error(`[AmapMCPClient] JSON 解析失败:`, textContent.text.substring(0, 200));
+            console.error(
+              `[AmapMCPClient] JSON 解析失败:`,
+              textContent.text.substring(0, 200)
+            );
             throw new Error(`返回数据格式错误`);
           }
         }
@@ -234,7 +245,9 @@ class AmapMCPClient {
         type: poi.type || "景点",
         address: poi.address || city,
         location: this.parseLocation(poi.location),
-        ticketPrice: poi.cost ? parseFloat(poi.cost) : Math.floor(Math.random() * 100) + 20,
+        ticketPrice: poi.cost
+          ? parseFloat(poi.cost)
+          : Math.floor(Math.random() * 100) + 20,
         duration: 2,
         description: "",
         imageUrl: poi.photos?.[0]?.url,
@@ -273,7 +286,9 @@ class AmapMCPClient {
         name: poi.name,
         address: poi.address || city,
         location: this.parseLocation(poi.location),
-        pricePerNight: poi.cost ? parseFloat(poi.cost) : 300 + Math.floor(Math.random() * 500),
+        pricePerNight: poi.cost
+          ? parseFloat(poi.cost)
+          : 300 + Math.floor(Math.random() * 500),
         rating: poi.rating ? parseFloat(poi.rating) : 4.0 + Math.random(),
         stars: 3 + Math.floor(Math.random() * 2),
         imageUrl: poi.photos?.[0]?.url,
@@ -293,15 +308,22 @@ class AmapMCPClient {
    */
   async queryWeather(city: string): Promise<WeatherInfo[]> {
     try {
+      console.log(`[AmapMCPClient] 查询天气 - 城市: ${city}`);
+
       const result = await this.callTool<WeatherResult>("maps_weather", {
         city,
-        extensions: "all",
       });
 
-      const casts = result.forecasts?.[0]?.casts ?? [];
-      console.log(`[AmapMCPClient] 获取到 ${casts.length} 天天气预报`);
+      // 注意：API 直接返回 forecasts 数组，不是 forecasts[0].casts
+      const forecasts = result.forecasts ?? [];
+      console.log(`[AmapMCPClient] 获取到 ${forecasts.length} 天天气预报`);
 
-      return casts.map((cast) => ({
+      if (forecasts.length === 0) {
+        console.log(`[AmapMCPClient] forecasts 为空`);
+        return [];
+      }
+
+      return forecasts.map((cast) => ({
         date: cast.date,
         description: cast.dayweather,
         maxTemp: parseInt(cast.daytemp, 10),
@@ -342,13 +364,15 @@ class AmapMCPClient {
       // 尝试通过高德地理编码 API 获取城市坐标
       const location = await this.geocode(city);
       if (location) {
-        console.log(`[AmapMCPClient] 从 API 获取 ${city} 坐标: [${location.longitude}, ${location.latitude}]`);
+        console.log(
+          `[AmapMCPClient] 从 API 获取 ${city} 坐标: [${location.longitude}, ${location.latitude}]`
+        );
         return location;
       }
     } catch (error) {
       console.error(`[AmapMCPClient] 获取 ${city} 坐标失败:`, error);
     }
-    
+
     // 失败时使用本地映射表
     return this.getCityCenter(city);
   }
@@ -360,8 +384,8 @@ class AmapMCPClient {
     const cityCoords: Record<string, GeoLocation> = {
       // 直辖市
       北京: { longitude: 116.407, latitude: 39.904 },
-      上海: { longitude: 121.473, latitude: 31.230 },
-      天津: { longitude: 117.190, latitude: 39.125 },
+      上海: { longitude: 121.473, latitude: 31.23 },
+      天津: { longitude: 117.19, latitude: 39.125 },
       重庆: { longitude: 106.551, latitude: 29.563 },
       // 省会城市
       广州: { longitude: 113.264, latitude: 23.129 },
@@ -371,29 +395,29 @@ class AmapMCPClient {
       苏州: { longitude: 120.585, latitude: 31.299 },
       成都: { longitude: 104.066, latitude: 30.572 },
       武汉: { longitude: 114.305, latitude: 30.593 },
-      西安: { longitude: 108.940, latitude: 34.341 },
+      西安: { longitude: 108.94, latitude: 34.341 },
       长沙: { longitude: 112.938, latitude: 28.228 },
       青岛: { longitude: 120.382, latitude: 36.067 },
       大连: { longitude: 121.614, latitude: 38.914 },
       厦门: { longitude: 118.089, latitude: 24.479 },
-      昆明: { longitude: 102.832, latitude: 24.880 },
+      昆明: { longitude: 102.832, latitude: 24.88 },
       三亚: { longitude: 109.508, latitude: 18.247 },
-      桂林: { longitude: 110.290, latitude: 25.274 },
+      桂林: { longitude: 110.29, latitude: 25.274 },
       丽江: { longitude: 100.227, latitude: 26.855 },
       张家界: { longitude: 110.479, latitude: 29.117 },
       黄山: { longitude: 118.337, latitude: 29.714 },
-      拉萨: { longitude: 91.132, latitude: 29.660 },
+      拉萨: { longitude: 91.132, latitude: 29.66 },
       哈尔滨: { longitude: 126.534, latitude: 45.803 },
       沈阳: { longitude: 123.432, latitude: 41.805 },
-      济南: { longitude: 117.120, latitude: 36.651 },
+      济南: { longitude: 117.12, latitude: 36.651 },
       郑州: { longitude: 113.625, latitude: 34.746 },
-      合肥: { longitude: 117.227, latitude: 31.820 },
+      合肥: { longitude: 117.227, latitude: 31.82 },
       福州: { longitude: 119.296, latitude: 26.074 },
       南昌: { longitude: 115.858, latitude: 28.682 },
       南宁: { longitude: 108.366, latitude: 22.817 },
-      贵阳: { longitude: 106.630, latitude: 26.647 },
+      贵阳: { longitude: 106.63, latitude: 26.647 },
       兰州: { longitude: 103.834, latitude: 36.061 },
-      太原: { longitude: 112.548, latitude: 37.870 },
+      太原: { longitude: 112.548, latitude: 37.87 },
       石家庄: { longitude: 114.514, latitude: 38.042 },
       长春: { longitude: 125.323, latitude: 43.817 },
       呼和浩特: { longitude: 111.749, latitude: 40.842 },
@@ -401,7 +425,7 @@ class AmapMCPClient {
       银川: { longitude: 106.278, latitude: 38.466 },
       西宁: { longitude: 101.778, latitude: 36.617 },
       海口: { longitude: 110.199, latitude: 20.044 },
-      香港: { longitude: 114.173, latitude: 22.320 },
+      香港: { longitude: 114.173, latitude: 22.32 },
       澳门: { longitude: 113.549, latitude: 22.198 },
       台北: { longitude: 121.565, latitude: 25.033 },
     };
@@ -421,8 +445,16 @@ class AmapMCPClient {
   /**
    * 模拟景点数据（使用传入的城市中心坐标）
    */
-  private getMockAttractionsWithCenter(city: string, limit: number, center: GeoLocation): Attraction[] {
-    const attractions: Array<{ name: string; type: string; ticketPrice: number }> = [
+  private getMockAttractionsWithCenter(
+    city: string,
+    limit: number,
+    center: GeoLocation
+  ): Attraction[] {
+    const attractions: Array<{
+      name: string;
+      type: string;
+      ticketPrice: number;
+    }> = [
       { name: `${city}博物馆`, type: "博物馆", ticketPrice: 50 },
       { name: `${city}公园`, type: "公园", ticketPrice: 0 },
       { name: `${city}古城`, type: "古迹", ticketPrice: 80 },
@@ -435,7 +467,9 @@ class AmapMCPClient {
       { name: `${city}艺术馆`, type: "艺术", ticketPrice: 40 },
     ];
 
-    console.log(`[AmapMCPClient] 使用城市中心 [${center.longitude}, ${center.latitude}] 生成模拟景点`);
+    console.log(
+      `[AmapMCPClient] 使用城市中心 [${center.longitude}, ${center.latitude}] 生成模拟景点`
+    );
 
     return attractions.slice(0, limit).map((a, i) => ({
       id: `mock-attraction-${i}`,
@@ -443,9 +477,9 @@ class AmapMCPClient {
       type: a.type,
       address: `${city}市中心`,
       // 在城市中心坐标附近随机分布
-      location: { 
-        longitude: center.longitude + (Math.random() - 0.5) * 0.08, 
-        latitude: center.latitude + (Math.random() - 0.5) * 0.08 
+      location: {
+        longitude: center.longitude + (Math.random() - 0.5) * 0.08,
+        latitude: center.latitude + (Math.random() - 0.5) * 0.08,
       },
       ticketPrice: a.ticketPrice,
       duration: 2,
@@ -457,8 +491,16 @@ class AmapMCPClient {
   /**
    * 模拟酒店数据（使用传入的城市中心坐标）
    */
-  private getMockHotelsWithCenter(city: string, limit: number, center: GeoLocation): Hotel[] {
-    const hotels: Array<{ name: string; pricePerNight: number; stars: number }> = [
+  private getMockHotelsWithCenter(
+    city: string,
+    limit: number,
+    center: GeoLocation
+  ): Hotel[] {
+    const hotels: Array<{
+      name: string;
+      pricePerNight: number;
+      stars: number;
+    }> = [
       { name: `${city}大酒店`, pricePerNight: 500, stars: 5 },
       { name: `${city}商务酒店`, pricePerNight: 300, stars: 4 },
       { name: `${city}快捷酒店`, pricePerNight: 150, stars: 3 },
@@ -471,9 +513,9 @@ class AmapMCPClient {
       name: h.name,
       address: `${city}市中心`,
       // 在城市中心坐标附近随机分布
-      location: { 
-        longitude: center.longitude + (Math.random() - 0.5) * 0.04, 
-        latitude: center.latitude + (Math.random() - 0.5) * 0.04 
+      location: {
+        longitude: center.longitude + (Math.random() - 0.5) * 0.04,
+        latitude: center.latitude + (Math.random() - 0.5) * 0.04,
       },
       pricePerNight: h.pricePerNight,
       rating: 4.0 + Math.random(),
