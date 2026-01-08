@@ -318,11 +318,8 @@ class UnsplashService {
   }
 }
 
-// 默认 Access Key（Demo 模式，每小时 50 次请求）
-const DEFAULT_ACCESS_KEY = "nIyozV8hr3zs1rSDyJLlPxHvyFXX5ct4LHPSSrcqg2E";
-
-// 创建单例实例
-const accessKey = process.env.UNSPLASH_ACCESS_KEY || DEFAULT_ACCESS_KEY;
+// 创建单例实例（必需配置 UNSPLASH_ACCESS_KEY 环境变量）
+const accessKey = process.env.UNSPLASH_ACCESS_KEY ?? "";
 export const unsplashService = new UnsplashService(accessKey);
 export { UnsplashService };
 export type { UnsplashPhoto };

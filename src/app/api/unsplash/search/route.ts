@@ -9,10 +9,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 
-// Unsplash Access Key - 只在服务端使用
-const UNSPLASH_ACCESS_KEY =
-  process.env.UNSPLASH_ACCESS_KEY ??
-  "nIyozV8hr3zs1rSDyJLlPxHvyFXX5ct4LHPSSrcqg2E";
+// Unsplash Access Key - 只在服务端使用（必需配置）
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 
 interface UnsplashSearchResult {
   id: string;

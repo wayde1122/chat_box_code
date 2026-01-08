@@ -46,9 +46,9 @@ class LLMService {
   }
 }
 
-// 默认配置 - 使用环境变量或默认值
+// 默认配置 - 使用环境变量（必需配置）
 const defaultConfig: LLMConfig = {
-  apiKey: process.env.LLM_API_KEY ?? "ms-584e709a-b528-4e51-90a2-fe769070eb5c",
+  apiKey: process.env.LLM_API_KEY ?? "",
   baseURL: process.env.LLM_BASE_URL ?? "https://api-inference.modelscope.cn/v1",
   model: process.env.LLM_MODEL ?? "deepseek-ai/DeepSeek-V3.2",
 };

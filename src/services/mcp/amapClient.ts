@@ -105,9 +105,8 @@ class AmapMCPClient {
         args: ["-y", "@amap/amap-maps-mcp-server"],
         env: {
           ...process.env,
-          // 使用 Web服务 API Key（用于 MCP/REST API 调用）
-          AMAP_MAPS_API_KEY:
-            process.env.AMAP_API_KEY ?? "a3e5febb5919d7d7a3d486da186b0652",
+          // 使用 Web服务 API Key（用于 MCP/REST API 调用，必需配置）
+          AMAP_MAPS_API_KEY: process.env.AMAP_API_KEY ?? "",
         },
       });
 
