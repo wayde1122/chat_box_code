@@ -11,7 +11,7 @@ export const games: readonly Game[] = [
     description: "经典贪吃蛇游戏，控制蛇吃食物，不断变长",
     icon: "Snake",
     gradient: "from-green-500 to-emerald-500",
-    status: "coming-soon",
+    status: "available",
   },
   {
     id: "2048",
