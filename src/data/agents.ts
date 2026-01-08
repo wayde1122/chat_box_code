@@ -4,7 +4,7 @@ export interface Agent {
   id: string;
   name: string;
   description: string;
-  icon: "Plane" | "Code" | "Pencil" | "BarChart3" | "Bot" | "Newspaper";
+  icon: "Plane" | "Code" | "Pencil" | "BarChart3" | "Bot" | "Newspaper" | "Gamepad2";
   href: string;
   status: AgentStatus;
   gradient: string;
@@ -37,6 +37,15 @@ export const agents: readonly Agent[] = [
     href: "/news",
     status: "available",
     gradient: "from-amber-500 to-orange-500",
+  },
+  {
+    id: "games",
+    name: "游戏助手",
+    description: "经典小游戏合集，休闲娱乐好帮手",
+    icon: "Gamepad2",
+    href: "/games",
+    status: "available",
+    gradient: "from-rose-500 to-pink-500",
   },
   {
     id: "writer",
