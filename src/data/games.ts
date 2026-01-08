@@ -19,7 +19,7 @@ export const games: readonly Game[] = [
     description: "数字合并游戏，滑动数字合成 2048",
     icon: "Grid2X2",
     gradient: "from-amber-500 to-yellow-500",
-    status: "coming-soon",
+    status: "available",
   },
   {
     id: "breakout",
