@@ -4,7 +4,7 @@ export interface Agent {
   id: string;
   name: string;
   description: string;
-  icon: "Plane" | "Code" | "Pencil" | "BarChart3" | "Bot" | "Newspaper" | "Gamepad2";
+  icon: "Plane" | "Code" | "Pencil" | "BarChart3" | "Bot" | "Newspaper" | "Gamepad2" | "Sparkles";
   href: string;
   status: AgentStatus;
   gradient: string;
@@ -46,6 +46,15 @@ export const agents: readonly Agent[] = [
     href: "/games",
     status: "available",
     gradient: "from-rose-500 to-pink-500",
+  },
+  {
+    id: "image-transform",
+    name: "二次元转换助手",
+    description: "一键将照片转换为精美的二次元风格画作",
+    icon: "Sparkles",
+    href: "/image-transform",
+    status: "available",
+    gradient: "from-pink-500 to-violet-500",
   },
   {
     id: "writer",
