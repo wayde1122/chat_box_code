@@ -29,7 +29,7 @@ const CONFIG = {
   MIN_SPEED: 50,
   /** 每吃一个食物加速 */
   SPEED_INCREMENT: 5,
-} as const;
+};
 
 /** 方向向量映射 */
 const DIRECTION_VECTORS: Record<Direction, Point> = {

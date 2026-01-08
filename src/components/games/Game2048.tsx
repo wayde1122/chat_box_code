@@ -15,7 +15,7 @@ const CONFIG = {
   GRID_SIZE: 4,
   /** 目标数字 */
   TARGET_VALUE: 2048,
-} as const;
+};
 
 /** 数字对应的颜色 */
 const TILE_COLORS: Record<number, { bg: string; text: string }> = {
