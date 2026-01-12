@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   web:
@@ -12,5 +12,8 @@ services:
       - LLM_BASE_URL=${LLM_BASE_URL}
       - LLM_MODEL=${LLM_MODEL}
       - TAVILY_API_KEY=${TAVILY_API_KEY}
+      # 火山引擎 Seedream 图片生成服务
+      - VOLCENGINE_API_KEY=${VOLCENGINE_API_KEY}
+      - VOLCENGINE_BASE_URL=${VOLCENGINE_BASE_URL:-https://ark.cn-beijing.volces.com/api/v3}
+      - VOLCENGINE_MODEL_ID=${VOLCENGINE_MODEL_ID:-doubao-seedream-4-5-251128}
     restart: unless-stopped
-
