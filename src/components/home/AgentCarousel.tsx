@@ -111,7 +111,7 @@ export function AgentCarousel({ agents }: AgentCarouselProps) {
             return (
               <div
                 key={agent.id}
-                className="absolute left-0 top-0 h-full w-full"
+                className="absolute left-1/2 top-1/2 w-[280px] -translate-x-1/2 -translate-y-1/2"
                 style={{
                   transformStyle: "preserve-3d",
                   transform: `rotateY(${angle}deg) translateZ(${radius}px)`,
@@ -188,13 +188,16 @@ function CarouselCard({
   return (
     <Link
       href={agent.href}
-      className={`group relative block h-full overflow-hidden rounded-xl bg-slate-800/50 p-[1px] backdrop-blur-sm transition-all duration-500 ${
+      className={`group relative block overflow-hidden rounded-xl bg-slate-800/50 p-[1px] backdrop-blur-sm transition-all duration-500 ${
         isActive ? "scale-100 opacity-100" : "scale-90 opacity-60"
       }`}
+      style={{ transformStyle: "flat" }}
     >
+      {/* 边框 */}
       <div className="absolute inset-0 bg-gradient-to-r from-slate-700 to-slate-600 opacity-50" />
-
-      <div className="relative flex h-full flex-col rounded-xl bg-slate-900/80 p-4">
+      
+      {/* 卡片内容 */}
+      <div className="relative flex flex-col rounded-xl bg-slate-900/80 p-4">
         {/* 图标 */}
         <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-br ${agent.gradient} opacity-50`}>
           <Icon className="h-5 w-5 text-white/80" strokeWidth={1.5} />
@@ -204,7 +207,7 @@ function CarouselCard({
         <h3 className="mb-1 text-sm font-semibold text-slate-300">{agent.name}</h3>
         <p className="mb-3 flex-1 text-xs text-slate-500 line-clamp-2">{agent.description}</p>
 
-        {/* 底部按钮 */}
+        {/* 状态标签 */}
         <div className="flex items-center gap-1.5 text-xs text-slate-500">
           <ArrowRight className="h-3 w-3" />
           <span>立即体验</span>
